@@ -35,36 +35,24 @@ var candleSeries = chart.addCandlestickSeries({
 	wickUpColor: 'rgba(255, 144, 0, 1)',
 });
 
-
-
-var binanceSocket = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@kline_1m");
-var upbitSocket = new WebSocket("wss://api.upbit.com/websocket/v1");
-var bithumbSocket = new WebSocket("wss://pubwss.bithumb.com/pub/ws");
-
 fetch('http://localhost:5000/history')
 	.then((r) => r.json())
 	.then((response) => {
-		console.log("fetch" + response)
+		console.log(response)
+
 		candleSeries.setData(response);
 	})
 
-upbitSocket.onmessage = function (event) {
- 	var message = JSON.parse(event.data);
- 	console.log(message);
-	 candleSeries.update({
-		 time: candlestick.t / 1000,
-		 open: candlestick.o,
-		 high: candlestick.h,
-		 low: candlestick.l,
-		 close: candlestick.c
-	 })
-}
+
+var binanceSocket = new WebSocket("wss://stream.binance.com:9443/ws/btcusdt@kline_1m");
 
 binanceSocket.onmessage = function (event) {	
 	var message = JSON.parse(event.data);
+
 	var candlestick = message.k;
 
-	console.log(candlestick);
+	console.log(candlestick)
+
 	candleSeries.update({
 		time: candlestick.t / 1000,
 		open: candlestick.o,
@@ -73,4 +61,3 @@ binanceSocket.onmessage = function (event) {
 		close: candlestick.c
 	})
 }
-
