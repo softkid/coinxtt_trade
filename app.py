@@ -20,61 +20,13 @@
 
 from flask import Flask, render_template, request, flash, redirect, jsonify
 import config, csv, datetime
-
 from binance.client import Client
 from binance.enums import *
-
-import asyncio, json
-
-import websockets
-import requests
-
 
 app = Flask(__name__)
 # app.secret_key = b'somelongrandomstring'
 
 client = Client(config.API_KEY, config.API_SECRET, tld='com')
-
-async def upbit_ws_client(callback):
-    uri = 'wss://api.upbit.com/websocket/v1'
-    async with websockets.connect(uri) as websocket:
-        subscribe_fmt = [
-            {'ticket': 'test'},
-            {
-                'type': 'ticker',
-                'codes': ['KRW-BTC'],
-                'isOnlyRealtime': True
-            },
-            {'format': 'SIMPLE'}
-        ]
-        subscribe_data = json.dumps(subscribe_fmt)
-        await websocket.send(subscribe_data)
-
-        while True:
-            print('111111111')
-            await callback(await websocket.recv())
-
-async def upbit_ws_client2(callback):
-    uri = 'wss://api.upbit.com/websocket/v1'
-    async with websockets.connect(uri) as websocket:
-        subscribe_fmt = [
-            {'ticket': 'test'},
-            {
-                'type': 'ticker',
-                'codes': ['KRW-XRP'],
-                'isOnlyRealtime': True
-            },
-            {'format': 'SIMPLE'}
-        ]
-        subscribe_data = json.dumps(subscribe_fmt)
-        await websocket.send(subscribe_data)
-
-        while True:
-            print('2222222222')
-            await callback(await websocket.recv()) 
-
-async def response_message(*args, **kwargs):
-    print(args)
 
 
 @app.route('/')
@@ -123,7 +75,7 @@ def settings():
 
 @app.route('/history')
 def history():
-    candlesticks = client.get_historical_klines("BTCUSDT", Client.KLINE_INTERVAL_1MINUTE, "1 Jul, 2020", "12 Jul, 2020")
+    candlesticks = client.get_historical_klines("BTCUSDT", Client.KLINE_INTERVAL_15MINUTE, "1 Jul, 2020", "12 Jul, 2020")
 
     processed_candlesticks = []
 
