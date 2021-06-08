@@ -80,11 +80,11 @@ async def response_message(*args, **kwargs):
 @app.route('/')
 def index():
 
-    url = "https://api.upbit.com/v1/candles/minutes/1" 
-    querystring = {"market":"KRW-BTC","count":"1"} 
-    headers = {"Accept": "application/json"}
-    response = requests.request("GET", url, headers=headers, params=querystring);
-    print(response.text);
+    # url = "https://api.upbit.com/v1/candles/minutes/1" 
+    # querystring = {"market":"KRW-BTC","count":"1"} 
+    # headers = {"Accept": "application/json"}
+    # response = requests.request("GET", url, headers=headers, params=querystring);
+    # # print(response.text);
 
     title = 'CoinXTT'
 
@@ -94,13 +94,6 @@ def index():
 
     exchange_info = client.get_exchange_info()
     symbols = exchange_info['symbols']
-
-
-    # tasks = [
-    #     asyncio.ensure_future(upbit_ws_client(response_message)),
-    #     asyncio.ensure_future(upbit_ws_client2(response_message))
-    # ]
-    # asyncio.get_event_loop().run_until_complete(asyncio.wait(tasks)) 
 
     return render_template('index.html', title=title, my_balances=balances, symbols=symbols)
 
@@ -149,11 +142,11 @@ def history():
 
 
 
-# if __name__ == '__main__':
-#     app.run(debug=True, threaded=True)
+if __name__ == '__main__':
+    app.run(debug=True, threaded=True)
 
-#     tasks = [
-#         asyncio.ensure_future(upbit_ws_client(response_message)),
-#         asyncio.ensure_future(upbit_ws_client2(response_message))
-#     ]
-#     asyncio.get_event_loop().run_until_complete(asyncio.wait(tasks))
+    tasks = [
+        asyncio.ensure_future(upbit_ws_client(response_message)),
+        asyncio.ensure_future(upbit_ws_client2(response_message))
+    ]
+    asyncio.get_event_loop().run_until_complete(asyncio.wait(tasks))
