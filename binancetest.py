@@ -4,8 +4,7 @@ import binance_api_key as bak
 import time
 import json
 
-from binance.websockets import *
-# from binance.websockets import BinanceSocketManager
+from binance.websockets import BinanceSocketManager
  
 def process_message(msg):
     msg_= msg['E'], msg['t'],msg['p'],msg["q"],msg["T"],msg["m"] #pre-processing

@@ -22,12 +22,55 @@ from flask import Flask, render_template, request, flash, redirect, jsonify
 import config, csv, datetime
 from binance.client import Client
 from binance.enums import *
+import asyncio, websockets, json
 
 app = Flask(__name__)
 # app.secret_key = b'somelongrandomstring'
 
 client = Client(config.API_KEY, config.API_SECRET, tld='com')
 
+async def upbit_ws_client(callback):
+    uri = 'wss://api.upbit.com/websocket/v1'
+    async with websockets.connect(uri) as websocket:
+        subscribe_fmt = [
+            {'ticket': 'test'},
+            {
+                'type': 'ticker',
+                'codes': ['KRW-BTC'],
+                'isOnlyRealtime': True
+            },
+            {'format': 'SIMPLE'}
+        ]
+        subscribe_data = json.dumps(subscribe_fmt)
+        await websocket.send(subscribe_data)
+
+        while True:
+            print('111111111')
+            await callback(await websocket.recv())
+
+
+async def binance_ws_client(callback):
+    uri = 'wss://stream.binance.com:9443/ws/btcusdt@kline_1m'
+    async with websockets.connect(uri) as websocket:
+        subscribe_fmt = [
+            {'ticket': 'test'},
+            {
+                'type': 'ticker',
+                'codes': ['KRW-XRP'],
+                'isOnlyRealtime': True
+            },
+            {'format': 'SIMPLE'}
+        ]
+        subscribe_data = json.dumps(subscribe_fmt)
+        await websocket.send(subscribe_data)
+
+        while True:
+            print('2222222222')
+            await callback(await websocket.recv())
+
+
+async def response_message(*args, **kwargs):
+    print(args)
 
 @app.route('/')
 def index():
@@ -88,8 +131,7 @@ def history():
             "close": data[4]
         }
 
-    processed_candlesticks.append(candlestick)
-
+    processed_candlesticks.append(candlestick) 
     return jsonify(processed_candlesticks)
 
 
@@ -99,6 +141,6 @@ if __name__ == '__main__':
 
     tasks = [
         asyncio.ensure_future(upbit_ws_client(response_message)),
-        asyncio.ensure_future(upbit_ws_client2(response_message))
+        asyncio.ensure_future(binance_ws_client(response_message))
     ]
     asyncio.get_event_loop().run_until_complete(asyncio.wait(tasks))
